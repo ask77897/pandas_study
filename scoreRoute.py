@@ -1,5 +1,5 @@
 from io import BytesIO
-from flask import render_template, Blueprint, send_file
+from flask import render_template, Blueprint, send_file, request
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
@@ -33,3 +33,15 @@ def score_chart(subject):
     plt.savefig(img, format='png', dpi=50)
     img.seek(0)
     return send_file(img, mimetype='image/png')
+
+@score.route('/list.json')
+def score_json():
+    query=request.args['query']
+    df=pd.read_csv('score.csv', index_col='지원번호')
+    filter=df['이름'].str.contains(query)
+    json=df[filter].to_json(orient='records')
+    return json
+
+@score.route('/page3')
+def score_page3():
+    return render_template('page3.html')
